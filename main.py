@@ -57,7 +57,7 @@ def format_tweet(text: str) -> str:
     """
     return trim_for_tweet(remove_hashtags(remove_at_characters(text)))
 
-def activate_bot():
+def main():
     raw_tweets = api.user_timeline(
         screen_name=TWITTER_USERNAME, count=4, tweet_mode='extended', include_rts=True)
 
@@ -76,7 +76,7 @@ def activate_bot():
             # Already liked
             pass
 
-    # Get last 5 tweets directly from Marcelo
+    # Get last 5 tweets directly from profile
     own_tweets = api.user_timeline(
         screen_name=TWITTER_USERNAME, count=6, tweet_mode='extended', include_rts=False)
 
@@ -94,5 +94,5 @@ def activate_bot():
         print(f"Failed to tweet: {generated_text}")
 
 
-
-activate_bot()
+if __name__ == "__main__":
+    main()
