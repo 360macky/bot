@@ -23,7 +23,7 @@ def get_wrapped_prompt(prompt_text):
     """
     return f"Today Marcelo tweeted: '{prompt_text}'.\nDescribe it with that little information using informal terms with maximum 200 characters. Only one emoji is allowed."
 
-def get_gpt_response(tweets_text):
+def get_gpt_response(tweets_text: str) -> str:
     """
     Get response from GPT-4 using OpenAI API
     """
@@ -42,18 +42,18 @@ def get_gpt_response(tweets_text):
 
 
 
-def remove_hashtags(text):
+def remove_hashtags(text: str) -> str:
     return ' '.join(word for word in text.split() if not word.startswith('#'))
 
-def remove_at_characters(text):
+def remove_at_characters(text: str) -> str:
     return ''.join(c for c in text if c != '@')
 
-def trim_for_tweet(text):
+def trim_for_tweet(text: str) -> str:
     return text[:280]
 
-def format_tweet(text):
+def format_tweet(text: str) -> str:
     """
-    Remove hashtags and trim to 280 characters for tweet
+    Remove hashtags (#), at (@), and trim to 280 characters for tweet
     """
     return trim_for_tweet(remove_hashtags(remove_at_characters(text)))
 
