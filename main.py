@@ -58,9 +58,11 @@ def format_tweet(text: str) -> str:
     return trim_for_tweet(remove_hashtags(remove_at_characters(text)))
 
 def main():
+    # Get last 4 tweets from profile including retweets
     raw_tweets = api.user_timeline(
         screen_name=TWITTER_USERNAME, count=4, tweet_mode='extended', include_rts=True)
 
+    # Like and retweet the tweets received from the profile
     for tweet in raw_tweets:
         try:
             api.retweet(tweet.id)
@@ -88,6 +90,7 @@ def main():
     print(f"Generated tweet: {generated_text}")
 
     try:
+        # Tweet generated text
         api.update_status(generated_text)
         print("Tweeted successfully")
     except Exception as e:
