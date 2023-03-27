@@ -46,6 +46,14 @@ pip install -r requirements.txt
 
 In Mac OS, you can use the `crontab` command to create a cron job. In Linux, you can use the `cron` command. In Windows, you can use the `Task Scheduler` to create a cron job.
 
+For example my cron job looks like this:
+
+```
+0 10 * * * /usr/bin/python3 /Users/marcelo/Documents/GitHub/twitter_bot/main.py
+```
+
+Which means that the script will run every day at 10am.
+
 ## 📦 Deployment
 
 You can deploy the bot on many platforms like [Google Cloud](https://cloud.google.com/), [Heroku](https://www.heroku.com/), [AWS](https://aws.amazon.com/), [Vercel](https://vercel.com/), etc.
