@@ -24,9 +24,24 @@
 
 A funny Twitter bot that generates descriptions of a person every day. The bot uses the [GPT-4 model](https://openai.com/product/gpt-4) to generate the descriptions with [Tweepy](https://www.tweepy.org/) to post on Twitter.
 
-## 💻 Development
+## 💻 Development (If you want to fork the project)
+
+### Creating an automated Twitter account
+
+Create a [Twitter Developer Account](https://developer.twitter.com/en/apply-for-access) and create a [Twitter Account](https://twitter.com/i/flow/signup) for the bot.
+
+Specify that your bot is [automated with a label](https://help.twitter.com/en/using-twitter/automated-account-labels).
+
+### Setting up the script
 
 Create a `.env` filling the variables from the `.env.example` file.
+
+Install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
 
 
 ## 📦 Deployment
