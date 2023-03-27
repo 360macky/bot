@@ -32,15 +32,17 @@ Create a [Twitter Developer Account](https://developer.twitter.com/en/apply-for-
 
 Specify that your bot is [automated with a label](https://help.twitter.com/en/using-twitter/automated-account-labels).
 
-### Setting up the script
+Get all the needed keys and tokens from the [Twitter Developer Portal](https://developer.twitter.com/en/portal/dashboard).
 
-Create a `.env` filling the variables from the `.env.example` file.
+### Setting up the script
 
 Install the dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
+
+Create a `.env` filling the variables from the `.env.example` file.
 
 ### Creating a cron job
 
