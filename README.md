@@ -24,6 +24,11 @@
 
 A funny Twitter bot that generates descriptions of a person every day. The bot uses the [GPT-4 model](https://openai.com/product/gpt-4) to generate the descriptions with [Tweepy](https://www.tweepy.org/) to post on Twitter.
 
+## 💻 Development
+
+Create a `.env` filling the variables from the `.env.example` file.
+
+
 ## 📦 Deployment
 
 You can deploy the bot on many platforms like [Google Cloud](https://cloud.google.com/), [Heroku](https://www.heroku.com/), [AWS](https://aws.amazon.com/), [Vercel](https://vercel.com/), etc.
