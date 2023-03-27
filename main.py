@@ -1,20 +1,14 @@
+#!/usr/local/bin/python3
+
 import tweepy
 import openai
 import logging
 from decouple import config
+from utils import get_tweepy_api
 
-logger = logging.getLogger()
+logger = logging.getLogger().setLevel(logging.INFO)
 
-TWITTER_API_KEY = config('CONSUMER_KEY')
-TWITTER_API_SECRET = config('CONSUMER_SECRET')
-TWITTER_ACCESS_TOKEN = config('ACCESS_TOKEN')
-TWITTER_ACCESS_TOKEN_SECRET = config('ACCESS_TOKEN_SECRET')
 TWITTER_USERNAME = config('TWITTER_USERNAME')
-
-auth = tweepy.OAuthHandler(TWITTER_API_KEY, TWITTER_API_SECRET)
-auth.set_access_token(TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
-api = tweepy.API(auth)
-
 openai.api_key = config("OPENAI_API_KEY")
 
 GPT_SYSTEM_INSTRUCTIONS_DESCRIBER = "You are a funny and sassy bot that could answer in English to make highly ethical jokes about Marcelo, a 21-year-old software engineer. Never use more than 200 characters. Always start a sentence as 'Well today Marcelo'"
@@ -31,6 +25,7 @@ def get_gpt_response(tweets_text: str) -> str:
     Get response from GPT-4 using OpenAI API
     """
     try:
+        logging.info(f"Generating AI response")
         response = openai.ChatCompletion.create(
             model=GPT_MODEL,
             messages=[
@@ -60,29 +55,30 @@ def format_tweet(text: str) -> str:
     """
     return trim_for_tweet(remove_hashtags(remove_at_characters(text)))
 
-def main():
+def main(tweepy_api):
+
     # Get last 4 tweets from profile including retweets
-    raw_tweets = api.user_timeline(
+    raw_tweets = tweepy_api.user_timeline(
         screen_name=TWITTER_USERNAME, count=4, tweet_mode='extended', include_rts=True)
 
     # Like and retweet the tweets received from the profile
     for tweet in raw_tweets:
         try:
-            api.retweet(tweet.id)
-            logger.info(f"Retweeted: {tweet.full_text}")
-        except Exception as e:
-            # Already retweeted
-            pass
+            tweepy_api.retweet(tweet.id)
+            logger.info(f"New retweeted tweet: {tweet.full_text}")
+        except tweepy.TweepyException:
+            logger.warning(f"Already retweeted: {tweet.full_text}")
 
         try:
-            api.create_favorite(tweet.id)
-            logger.error(f"Liked: {tweet.full_text}")
-        except Exception as e:
-            # Already liked
-            pass
+            tweepy_api.create_favorite(tweet.id)
+            logger.error(f"New liked tweet: {tweet.full_text}")
+        except tweepy.TweepyException:
+            logger.warning(f"Already liked: {tweet.full_text}")
+
 
     # Get last 5 tweets directly from profile
-    own_tweets = api.user_timeline(
+    logging.info("Getting tweets from profile")
+    own_tweets = tweepy_api.user_timeline(
         screen_name=TWITTER_USERNAME, count=6, tweet_mode='extended', include_rts=False)
 
     # Make all tweets, as one string of text separated by ;
@@ -90,15 +86,17 @@ def main():
 
     # Generate text using GPT-4, then remove hashtags and trim to 280 characters
     generated_text = format_tweet(get_gpt_response(tweets_text))
-    logger.info(f"Generated tweet: {generated_text}")
+    logging.info(f"Generated tweet: {generated_text}")
 
     try:
         # Tweet generated text
-        api.update_status(generated_text)
-        logger.info("Tweeted successfully")
+        tweepy_api.update_status(generated_text)
+        logging.info("Tweeted successfully!")
     except Exception as e:
         logger.error(f"Failed to tweet: {generated_text}")
 
 
 if __name__ == "__main__":
-    main()
+    logging.info("Starting bot")
+    tweepy_api = get_tweepy_api()
+    main(tweepy_api)
