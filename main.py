@@ -1,6 +1,9 @@
 import tweepy
 import openai
+import logging
 from decouple import config
+
+logger = logging.getLogger()
 
 TWITTER_API_KEY = config('CONSUMER_KEY')
 TWITTER_API_SECRET = config('CONSUMER_SECRET')
@@ -38,7 +41,7 @@ def get_gpt_response(tweets_text: str) -> str:
         )
         return response.choices[0].message.content
     except:
-        print("Failed to get GPT response")
+        logger.error("Failed to get GPT response")
 
 
 
@@ -66,14 +69,14 @@ def main():
     for tweet in raw_tweets:
         try:
             api.retweet(tweet.id)
-            print(f"Retweeted: {tweet.full_text}")
+            logger.info(f"Retweeted: {tweet.full_text}")
         except Exception as e:
             # Already retweeted
             pass
 
         try:
             api.create_favorite(tweet.id)
-            print(f"Liked: {tweet.full_text}")
+            logger.error(f"Liked: {tweet.full_text}")
         except Exception as e:
             # Already liked
             pass
@@ -87,14 +90,14 @@ def main():
 
     # Generate text using GPT-4, then remove hashtags and trim to 280 characters
     generated_text = format_tweet(get_gpt_response(tweets_text))
-    print(f"Generated tweet: {generated_text}")
+    logger.info(f"Generated tweet: {generated_text}")
 
     try:
         # Tweet generated text
         api.update_status(generated_text)
-        print("Tweeted successfully")
+        logger.info("Tweeted successfully")
     except Exception as e:
-        print(f"Failed to tweet: {generated_text}")
+        logger.error(f"Failed to tweet: {generated_text}")
 
 
 if __name__ == "__main__":
