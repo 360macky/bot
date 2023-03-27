@@ -12,3 +12,8 @@
 <p align="center">
     🤖 Personal Twitter bot powered by GPT technology 🦄
 </p>
+
+## 🚀 Concept
+
+A funny Twitter bot that generates descriptions of a person every day. The bot uses the [GPT-4 model](https://openai.com/product/gpt-4) to generate the descriptions with [Tweepy](https://www.tweepy.org/) to post on Twitter.
+
