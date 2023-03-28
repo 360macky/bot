@@ -24,6 +24,16 @@
 
 A funny Twitter bot that generates descriptions of a person every day. The bot uses the [GPT-4 model](https://openai.com/product/gpt-4) to generate the descriptions with [Tweepy](https://www.tweepy.org/) to post on Twitter.
 
+It also sends a notification to my WhatsApp number using [Twilio](https://www.twilio.com/), whenever the bot performs a tweet.
+
+### 🤖 Current abilities
+
+This bot has the following abilities:
+
+- Describe owner's mood every day based on last tweet
+- Answer questions in mentions
+- Retweet and like owner's tweets
+
 ## 💻 Development (If you want to fork the project)
 
 ### Creating an automated Twitter account
