@@ -4,8 +4,7 @@ import tweepy
 import openai
 import logging
 from decouple import config
-from utils import get_tweepy_api
-from twilio.rest import Client
+from utils import get_tweepy_api, sent_notification_to_owner
 
 logger = logging.getLogger().setLevel(logging.INFO)
 
@@ -39,20 +38,6 @@ def get_gpt_response(tweets_text: str) -> str:
     except:
         logging.error("Failed to get GPT response")
 
-
-def sent_notification_to_owner(message: str) -> None:
-    """
-    Send notification to owner via WhatsApp
-    """
-    account_sid = config('TWILIO_ACCOUNT_SID')
-    auth_token = config('TWILIO_AUTH_TOKEN')
-    phone_number = config('TWILIO_PHONE_NUMBER')
-    client = Client(account_sid, auth_token)
-
-    client.messages.create(body=message,
-                           from_='whatsapp:+14155238886',
-                           to=f"whatsapp:{phone_number}"
-    )
 
 def remove_hashtags(text: str) -> str:
     return ' '.join(word for word in text.split() if not word.startswith('#'))
