@@ -5,6 +5,7 @@ import openai
 import logging
 from decouple import config
 from utils import get_tweepy_api
+from twilio.rest import Client
 
 logger = logging.getLogger().setLevel(logging.INFO)
 
@@ -36,9 +37,22 @@ def get_gpt_response(tweets_text: str) -> str:
         )
         return response.choices[0].message.content
     except:
-        logger.error("Failed to get GPT response")
+        logging.error("Failed to get GPT response")
 
 
+def sent_notification_to_owner(message: str) -> None:
+    """
+    Send notification to owner via WhatsApp
+    """
+    account_sid = config('TWILIO_ACCOUNT_SID')
+    auth_token = config('TWILIO_AUTH_TOKEN')
+    phone_number = config('TWILIO_PHONE_NUMBER')
+    client = Client(account_sid, auth_token)
+
+    client.messages.create(body=message,
+                           from_='whatsapp:+14155238886',
+                           to=f"whatsapp:{phone_number}"
+    )
 
 def remove_hashtags(text: str) -> str:
     return ' '.join(word for word in text.split() if not word.startswith('#'))
@@ -59,22 +73,28 @@ def main(tweepy_api):
 
     # Get last 4 tweets from profile including retweets
     raw_tweets = tweepy_api.user_timeline(
-        screen_name=TWITTER_USERNAME, count=4, tweet_mode='extended', include_rts=True)
+        screen_name=TWITTER_USERNAME, count=6, tweet_mode='extended', include_rts=True)
+
+    tweet_liked_quantity = 0
+    tweet_retweeted_quantity = 0
 
     # Like and retweet the tweets received from the profile
     for tweet in raw_tweets:
         try:
             tweepy_api.retweet(tweet.id)
-            logger.info(f"New retweeted tweet: {tweet.full_text}")
+            tweet_liked_quantity += 1
+            logging.info(f"New retweeted tweet: {tweet.full_text}")
         except tweepy.TweepyException:
-            logger.warning(f"Already retweeted: {tweet.full_text}")
+            logging.warning(f"Already retweeted: {tweet.full_text}")
 
         try:
             tweepy_api.create_favorite(tweet.id)
-            logger.error(f"New liked tweet: {tweet.full_text}")
+            tweet_retweeted_quantity += 1
+            logging.error(f"New liked tweet: {tweet.full_text}")
         except tweepy.TweepyException:
-            logger.warning(f"Already liked: {tweet.full_text}")
+            logging.warning(f"Already liked: {tweet.full_text}")
 
+    sent_notification_to_owner(f"🤖 *Marcelo Bot* liked {tweet_liked_quantity} tweets and retweeted {tweet_retweeted_quantity} tweets")
 
     # Get last 5 tweets directly from profile
     logging.info("Getting tweets from profile")
@@ -91,12 +111,17 @@ def main(tweepy_api):
     try:
         # Tweet generated text
         tweepy_api.update_status(generated_text)
-        logging.info("Tweeted successfully!")
+        logging.info("Tweeted successfully")
+        sent_notification_to_owner(f"🤖 *Marcelo Bot* tweeted: {generated_text}")
     except Exception as e:
-        logger.error(f"Failed to tweet: {generated_text}")
+        logging.error(f"Failed to tweet: {generated_text}")
+
+
 
 
 if __name__ == "__main__":
+    sent_notification_to_owner("🚀 *Marcelo Bot* starting...")
     logging.info("Starting bot")
     tweepy_api = get_tweepy_api()
     main(tweepy_api)
+    sent_notification_to_owner("🤖 *Marcelo Bot* finished!")
