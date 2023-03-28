@@ -26,6 +26,8 @@ A funny Twitter bot that generates descriptions of a person every day. The bot u
 
 It also sends a notification to my WhatsApp number using [Twilio](https://www.twilio.com/), whenever the bot performs a tweet.
 
+The purpose of this bot is to have fun, learn about Twitter API and perform some experiments with OpenAI GPT-4.
+
 ### 🤖 Current abilities
 
 This bot has the following abilities:
