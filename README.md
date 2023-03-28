@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-    🤖 Personal Twitter bot powered by GPT technology 🦄
+    🤖 Personal Twitter bot powered by GPT technology 🦄 - <a href="https://twitter.com/360mackyBOT">@360mackyBOT</a>
 </p>
 
 <p align="center">
