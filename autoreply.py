@@ -11,21 +11,39 @@ logger = logging.getLogger().setLevel(logging.INFO)
 
 GPT_SYSTEM_INSTRUCTIONS_MENTION = "You are a fun bot that answers people's questions very briefly and irreverently. At the end you place an emoji. If they ask you in Spanish, answer in Spanish!"
 GPT_MODEL='gpt-3.5-turbo'
-INTERVAL = 120 # 2 minutes
+INTERVAL = 60 # 2 minutes
 
 openai.api_key = config("OPENAI_API_KEY")
 
-def get_answer(username: str, question: str):
+def get_answer(username: str, question: str, previous_conversation: dict):
     """
     Get answer from GPT-3.5-turbo using OpenAI API
     """
+
+    # If previous_conversation is not None, we need to add the previous conversation to the GPT-3.5-turbo
+    # instructions
+    if previous_conversation is not None:
+        logging.info(f"Bot will reply with the context of a previous conversation")
+        original_question = previous_conversation['original_question']
+        bot_previous_answer = previous_conversation['bot_previous_answer']
+        messages = [
+            {"role": "system", "content": GPT_SYSTEM_INSTRUCTIONS_MENTION},
+            {"role": "user", "content": f"Hi, my name is {username}, I'm asking: {original_question}?"},
+            {"role": "assistant", "content": f"{bot_previous_answer}"},
+            {"role": "user", "content": f"{question}?"}
+        ]
+    else:
+        logging.info(f"Bot will reply without context")
+        messages = [
+            {"role": "system", "content": GPT_SYSTEM_INSTRUCTIONS_MENTION},
+            {"role": "user", "content": f"Hi, my name is {username}, I'm asking: {question}?"}
+        ]
+
+
     try:
         response = openai.ChatCompletion.create(
             model=GPT_MODEL,
-            messages=[
-                {"role": "system", "content": GPT_SYSTEM_INSTRUCTIONS_MENTION},
-                {"role": "user", "content": f"Hi, my name is {username}, I'm asking: {question}?"}
-            ],
+            messages=messages,
             max_tokens=70
         )
         logging.info(f"GPT successfully generated anser: {response.choices[0].message.content}")
@@ -52,18 +70,34 @@ def check_mentions(api, since_id):
 
         # Check if we have already liked this tweet
         if tweet.favorited:
-            logging.info(f"Already liked {tweet.text}")
             continue
         else:
-            logging.info(f"Liking {tweet.text}")
+            logging.info(f"Liking {tweet.text}. Continue with the process...")
             tweet.favorite()
 
         # Update the since_id
         new_since_id = max(tweet.id, new_since_id)
 
-        # Ignore replies
+        # If the tweet is a reply, maybe it's a continuation of a previous conversation
+        # or maybe it's a question to the bot itself. So let's check that.
+        previous_conversation = None
+
         if tweet.in_reply_to_status_id is not None:
-            continue
+            # Get the previous tweet:
+            previous_tweet = api.get_status(tweet.in_reply_to_status_id)
+            # Is the previous tweet from the bot?
+            if previous_tweet.user.screen_name == "360mackyBOT":
+                logging.info(f"Bot is replying to a previous conversation")
+                bot_previous_answer = remove_bot_mention(previous_tweet.text)
+                
+                # Get the original question:
+                original_question = api.get_status(previous_tweet.in_reply_to_status_id)
+
+                # Wrap the original question and the previous answer in a dict "previous_conversation":
+                previous_conversation = {
+                    "original_question": original_question.text,
+                    "bot_previous_answer": bot_previous_answer
+                }
 
 
         if not tweet.user.following:
@@ -73,7 +107,7 @@ def check_mentions(api, since_id):
 
         logging.info(f"Answering question of {user_question} to {tweet.user.name}")
 
-        generated_answer = format_tweet(get_answer(tweet.user.name, user_question))
+        generated_answer = format_tweet(get_answer(tweet.user.name, user_question, previous_conversation))
 
         if generated_answer is None:
             sent_notification_to_owner(f"🤖 *Marcelo Bot* failed to generated an answer to *{user_question}*")
