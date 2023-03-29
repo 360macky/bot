@@ -67,6 +67,13 @@ def check_mentions(api, since_id):
 
     # Get mentions
     for tweet in tweepy.Cursor(api.mentions_timeline, since_id=since_id).items():
+        
+        user_question = remove_bot_mention(tweet.text)
+
+        # Check if user question is empty
+        if user_question == "" or user_question == " ":
+            logging.info(f"User question is empty. Continue with the process...")
+            continue
 
         # Check if we have already liked this tweet
         if tweet.favorited:
@@ -103,7 +110,6 @@ def check_mentions(api, since_id):
         if not tweet.user.following:
             tweet.user.follow()
 
-        user_question = remove_bot_mention(tweet.text)
 
         logging.info(f"Answering question of {user_question} to {tweet.user.name}")
 
