@@ -24,6 +24,8 @@
 
 A funny Twitter bot that generates descriptions of a person every day. The bot uses the [GPT-4 model](https://openai.com/product/gpt-4) to generate the descriptions with [Tweepy](https://www.tweepy.org/) to post on Twitter.
 
+It uses Tweepy cursor to get bot mentions, and then it uses the [GPT-4 model](https://openai.com/product/gpt-4) to generate the descriptions.
+
 It also sends a notification to my WhatsApp number using [Twilio](https://www.twilio.com/), whenever the bot performs a tweet.
 
 The purpose of this bot is to have fun, learn about Twitter API and perform some experiments with OpenAI GPT-4.
@@ -36,7 +38,9 @@ This bot has the following abilities:
 - Answer questions in mentions
 - Retweet and like owner's tweets
 
-## 💻 Development (If you want to fork the project)
+## 💻 Development
+
+The following is a guide to help you set up the bot on your machine.
 
 ### Creating an automated Twitter account
 
