@@ -11,7 +11,7 @@ logger = logging.getLogger().setLevel(logging.INFO)
 
 GPT_SYSTEM_INSTRUCTIONS_MENTION = "You are a fun bot that answers people's questions very briefly and irreverently. At the end you place an emoji. If they ask you in Spanish, answer in Spanish!"
 GPT_MODEL='gpt-3.5-turbo'
-INTERVAL = 60 # 2 minutes
+INTERVAL = 60
 
 openai.api_key = config("OPENAI_API_KEY")
 
